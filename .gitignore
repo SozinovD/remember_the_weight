@@ -1,0 +1,8 @@
+*__pycache__*
+config.py
+*.log
+tips.txt
+*.db
+nohup.out
+*.sh
+tests/*
