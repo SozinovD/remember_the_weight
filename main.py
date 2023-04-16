@@ -97,7 +97,7 @@ async def get_weight_from_user(message: types.Message, state: FSMContext):
 
   new_rec.set_user_id(message.from_user.id)
   new_rec.set_date_ts(round(time.time(), 0))
-  new_rec.set_weight(weight)
+  new_rec.set_weight(round(weight, 2))
   new_rec.set_comment(comment)
 
   result = db.add_rec(new_rec)
