@@ -75,20 +75,3 @@ def del_last_rec_1_hour(user_id, forced=False):
   if result == filters:
     result = 'Record deleted'
   return result
-
-
-# if __name__ == '__main__':
-#   print(del_last_rec_1_hour('317600836'))
-
-  # print(db_requests.update_records_in_db('records', 'currency = "BTC"', 'id > 14'))
-  # print(set_amount_usd_all_recs(db_file_name))
-  # curr_arr = [[['name', 'GBP']], [['name', 'DOGE']], [['name', 'USDT']]]
-  # print(db_requests.add_many_records_to_db('currencies', curr_arr))
-#   print(del_curr(db_requests.'GBP'))
-  # print(add_curr('KZK'))
-#   print(get_last_n_recs(317600836, 3))
-#   print(get_currs(db_file_name))
-  # print(get_last_rec_currency('317600836'))
-#   print(db_requests.select('records')[-1][0])
-#   print(db_requests.select('records', '*', 'user_id="123456"'))
-#   print(get_recs_user('123456'))

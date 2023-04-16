@@ -1,16 +1,7 @@
 import db_handler as db
-
-# from datetime import datetime
 import datetime
-
 from pathlib import Path
-
 from matplotlib import pyplot as plt
-
-# from aiogram.types import ReplyKeyboardRemove, \
-#     ReplyKeyboardMarkup, KeyboardButton, \
-#     InlineKeyboardMarkup, InlineKeyboardButton
-
 
 help_msg = '''
 This bot helps you to track your weught dynamic
