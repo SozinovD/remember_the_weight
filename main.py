@@ -48,7 +48,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 
 @dp.message_handler(commands="start")
 async def show_help(message: types.Message):
-  funcs.show_help()
+  await message.answer(funcs.get_help_msg())
 
 @dp.message_handler(commands="add_record")
 async def do_add_record(message: types.Message):
