@@ -69,6 +69,6 @@ def make_rec_readable(rec):
                   'weight: {weight} {measure}\n' \
                   'comment: {comment}'
 
-  line = line_template.format(id=rec.id, date=datetime.utcfromtimestamp(rec.date_ts).strftime('%Y-%m-%d %H:%M:%S'),
+  line = line_template.format(id=rec.id, date=datetime.datetime.utcfromtimestamp(rec.date_ts).strftime('%Y-%m-%d %H:%M:%S'),
                               weight=rec.weight, measure=rec.measure, comment=rec.comment )
   return line
