@@ -51,6 +51,8 @@ def get_graph(user_id, days):
   dates_arr = []
   weights_arr = []
 
+  records.sort(key=lambda x: x.date_ts, reverse = False)
+
   for rec in records:
     # dates_arr.append(datetime.datetime.utcfromtimestamp(rec.date_ts).strftime('%Y-%m-%d %H:00'))
     dates_arr.append(datetime.datetime.utcfromtimestamp(rec.date_ts).strftime('%Y-%m-%d'))
