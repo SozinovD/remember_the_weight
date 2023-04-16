@@ -3,6 +3,8 @@
 import time
 from config import bot_token
 
+import datetime
+
 from aiogram import Bot, types
 from aiogram.utils import executor
 from aiogram.utils.markdown import text
@@ -30,6 +32,7 @@ dp = Dispatcher(bot, storage=storage)
 # States
 class Form(StatesGroup):
   weight = State()  # Will be represented in storage as 'Form:weight'
+  weight_past = State()
 
 # You can use state '*' if you need to handle all states
 @dp.message_handler(state='*', commands='cancel')
@@ -64,16 +67,33 @@ async def del_rec_1_hour(message: types.Message):
   await message.answer(db.del_last_rec_1_hour(message.from_user.id))
 
 @dp.message_handler(commands="show_week")
-async def do_add_record(message: types.Message):
+async def show_week(message: types.Message):
   week_graph_path = funcs.get_graph(message.from_user.id, 7)
   week_graph = InputFile(week_graph_path)
   await message.answer_photo(photo=week_graph)
 
 @dp.message_handler(commands='show_month')
-async def do_add_record(message: types.Message):
+async def show_month(message: types.Message):
   month_graph_path = funcs.get_graph(message.from_user.id, 30)
   month_graph = InputFile(month_graph_path)
   await message.answer_photo(photo=month_graph)
+
+@dp.message_handler(commands='add_skipped_record')
+async def show_month(message: types.Message):
+  await Form.weight_past.set()
+  line =  'Input date, your weight and an optional comment, valid examples:\n' \
+          '*13.02.2023 78.3*\n' \
+          'or this:\n' \
+          '*13.02.2023 40.1 oops, i need to eat!*'
+  await message.answer(line, parse_mode='Markdown')
+
+
+# @dp.message_handler(commands='show_n_days')
+# async def show_n_days(message: types.Message):
+#   custom_graph_path = funcs.get_graph(message.from_user.id, 30)
+#   custom_graph = InputFile(custom_graph_path)
+#   await message.answer_photo(photo=custom_graph)
+
 
 @dp.message_handler(state=Form.weight)
 async def get_weight_from_user(message: types.Message, state: FSMContext):
@@ -83,20 +103,52 @@ async def get_weight_from_user(message: types.Message, state: FSMContext):
 
   weight = weight.replace( ',', '.' )
 
-  try:
-    weight = float(weight)
-  except Exception:
-    line = 'ERROR: weight is not a number:\n' + weight
-    await message.reply(line)
-    return
-
   comment = message.text.split(' ')[1:]
   comment = ' '.join(comment)
 
+  await message.reply(add_record(message.from_user.id, weight, comment))
+
+  await state.finish()
+
+@dp.message_handler(state=Form.weight_past)
+async def get_weight_from_user(message: types.Message, state: FSMContext):
+
+  date = message.text.split(' ')[0:1]
+  date = ' '.join(date)
+
+  weight = message.text.split(' ')[1:2]
+  weight = ''.join(weight)
+
+  weight = weight.replace( ',', '.' )
+
+  comment = message.text.split(' ')[2:]
+  comment = ' '.join(comment)
+
+  await message.reply(add_record(message.from_user.id, weight, comment, date))
+
+  await state.finish()
+
+
+
+def add_record(user_id, weight, comment, date=None):
+  try:
+    weight = float(weight)
+  except Exception:
+    line = 'ERROR: weight is not a number:\n' + weight    
+    return line
+
   new_rec = classes.Record()
 
-  new_rec.set_user_id(message.from_user.id)
-  new_rec.set_date_ts(round(time.time(), 0))
+  new_rec.set_user_id(user_id)
+  if date != None:
+    try:
+      date_ts = float(time.mktime(datetime.datetime.strptime(date, "%d.%m.%Y").timetuple()))
+    except Exception as e:
+      return e
+    print('date_ts', date_ts)
+    new_rec.set_date_ts(round(date_ts, 0))
+  else:
+    new_rec.set_date_ts(round(time.time(), 0))
   new_rec.set_weight(round(weight, 2))
   new_rec.set_comment(comment)
 
@@ -106,9 +158,9 @@ async def get_weight_from_user(message: types.Message, state: FSMContext):
     line += funcs.make_rec_readable(new_rec)
   else:
     line = result
-  await message.answer(line)
+  return line
 
-  await state.finish()
+
 
 if __name__ == '__main__':
 

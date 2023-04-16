@@ -9,9 +9,11 @@ There are commands below:
 
 /start - show this help page
 /add_record - add new record
+/add_skipped_record - add record for a past day
 /del_record_1_hour - delete last record that is not older than 1 hour
 /show_week - show weight dynamic for last 7 days
 /show_month - show weight dynamic for last month
+/cancel - cancel any action
 '''
 
 def get_help_msg():
@@ -49,7 +51,8 @@ def get_graph(user_id, days):
   weights_arr = []
 
   for rec in records:
-    dates_arr.append(datetime.datetime.utcfromtimestamp(rec.date_ts).strftime('%Y-%m-%d %H:00'))
+    # dates_arr.append(datetime.datetime.utcfromtimestamp(rec.date_ts).strftime('%Y-%m-%d %H:00'))
+    dates_arr.append(datetime.datetime.utcfromtimestamp(rec.date_ts).strftime('%Y-%m-%d'))
     weights_arr.append(rec.weight)
 
   plt.plot(dates_arr, weights_arr)
