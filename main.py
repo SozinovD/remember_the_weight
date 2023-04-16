@@ -33,6 +33,7 @@ dp = Dispatcher(bot, storage=storage)
 class Form(StatesGroup):
   weight = State()  # Will be represented in storage as 'Form:weight'
   weight_past = State()
+  graph_n_days = State()
 
 # You can use state '*' if you need to handle all states
 @dp.message_handler(state='*', commands='cancel')
@@ -48,7 +49,6 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     await state.finish()
     await message.reply('Cancelled.', reply_markup=types.ReplyKeyboardRemove())
 
-
 @dp.message_handler(commands="start")
 async def show_help(message: types.Message):
   await message.answer(funcs.get_help_msg())
@@ -60,6 +60,15 @@ async def do_add_record(message: types.Message):
           '*78.3*\n' \
           'or this:\n' \
           '*40.1 oops, i need to eat!*'
+  await message.answer(line, parse_mode='Markdown')
+
+@dp.message_handler(commands='add_skipped_record')
+async def show_month(message: types.Message):
+  await Form.weight_past.set()
+  line =  'Input date, your weight and an optional comment, valid examples:\n' \
+          '*13.02.2023 78.3*\n' \
+          'or this:\n' \
+          '*13.02.2023 40.1 oops, i need to eat!*'
   await message.answer(line, parse_mode='Markdown')
 
 @dp.message_handler(commands="del_rec_1_hour")
@@ -78,21 +87,23 @@ async def show_month(message: types.Message):
   month_graph = InputFile(month_graph_path)
   await message.answer_photo(photo=month_graph)
 
-@dp.message_handler(commands='add_skipped_record')
-async def show_month(message: types.Message):
-  await Form.weight_past.set()
-  line =  'Input date, your weight and an optional comment, valid examples:\n' \
-          '*13.02.2023 78.3*\n' \
-          'or this:\n' \
-          '*13.02.2023 40.1 oops, i need to eat!*'
-  await message.answer(line, parse_mode='Markdown')
+@dp.message_handler(commands='show_n_days')
+async def show_n_days(message: types.Message):
+  await Form.graph_n_days.set()
+  await message.answer('Input number of days you need like so:\n40')
 
-
-# @dp.message_handler(commands='show_n_days')
-# async def show_n_days(message: types.Message):
-#   custom_graph_path = funcs.get_graph(message.from_user.id, 30)
-#   custom_graph = InputFile(custom_graph_path)
-#   await message.answer_photo(photo=custom_graph)
+@dp.message_handler(state=Form.graph_n_days)
+async def get_weight_from_user(message: types.Message, state: FSMContext):
+  days_num = message.text
+  try:
+    days_num = int(days_num)
+    custom_graph_path = funcs.get_graph(message.from_user.id, days_num)
+    custom_graph = InputFile(custom_graph_path)
+    await message.answer_photo(photo=custom_graph)
+  except Exception:
+    line = 'ERROR: number of days is not an integer:\n' + days_num
+    await message.answer(line)
+  await state.finish()
 
 
 @dp.message_handler(state=Form.weight)
@@ -111,7 +122,7 @@ async def get_weight_from_user(message: types.Message, state: FSMContext):
   await state.finish()
 
 @dp.message_handler(state=Form.weight_past)
-async def get_weight_from_user(message: types.Message, state: FSMContext):
+async def get_weight_from_user_past(message: types.Message, state: FSMContext):
 
   date = message.text.split(' ')[0:1]
   date = ' '.join(date)
@@ -127,8 +138,6 @@ async def get_weight_from_user(message: types.Message, state: FSMContext):
   await message.reply(add_record(message.from_user.id, weight, comment, date))
 
   await state.finish()
-
-
 
 def add_record(user_id, weight, comment, date=None):
   try:

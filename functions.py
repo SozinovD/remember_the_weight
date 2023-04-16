@@ -13,6 +13,7 @@ There are commands below:
 /del_record_1_hour - delete last record that is not older than 1 hour
 /show_week - show weight dynamic for last 7 days
 /show_month - show weight dynamic for last month
+/show_n_days - show as many days as you want
 /cancel - cancel any action
 '''
 
