@@ -1,94 +1,75 @@
 import db_handler as db
 
-from datetime import datetime
+# from datetime import datetime
+import datetime
 
-from aiogram.types import ReplyKeyboardRemove, \
-    ReplyKeyboardMarkup, KeyboardButton, \
-    InlineKeyboardMarkup, InlineKeyboardButton
+from pathlib import Path
+
+from matplotlib import pyplot as plt
+
+# from aiogram.types import ReplyKeyboardRemove, \
+#     ReplyKeyboardMarkup, KeyboardButton, \
+#     InlineKeyboardMarkup, InlineKeyboardButton
 
 
 help_msg = '''
-This bot helps you to track your money usage
+This bot helps you to track your weught dynamic
 There are commands below:
 
-/help - show this help page
-/add_record - add new income or expense record
-/show_report - generate report (will be avalible in v2 and above)
+/start - show this help page
+/add_record - add new record
+/del_record_1_hour - delete last record that is not older than 1 hour
+/show_week - show weight dynamic for last 7 days
+/show_month - show weight dynamic for last month
 '''
-
-def get_back_to_start_btn(divider):
-  ''' Return btn with callback data that tells to go to start '''
-  return InlineKeyboardButton(text='Back to start', callback_data=enc_callback_data(divider, 'back_to_start', '.'))
 
 def get_help_msg():
   ''' Just return help msg '''
   return help_msg
 
-def enc_callback_data(divider, *words):
-  ''' Encode data into one line for callback using a divider, return line '''
-  call_data = ''
-  for word in words:
-    call_data += str(word) + str(divider)
-  return call_data
+def day_end_ts(t):
+  ''' Return end of the day '''
+  dt = t.replace(second=59, microsecond=59, minute=59, hour=23)
+  ts = int(dt.timestamp())
+  return str(ts)
 
-def dec_callback_data(divider, call_data):
-  ''' Decode data from callback using a divider, return in array '''
-  data_arr = []
-  for word in call_data.split(divider):
-    data_arr.append(word)
-  return data_arr
+def get_target_day_ts(days):
+  ''' Return ts of end of the day that was N days ago '''
+  today_end_ts = day_end_ts(datetime.datetime.now())
+  days_ts_delta = days * 24 * 60 * 60
+  target_date_ts = int(today_end_ts) - int(days_ts_delta)
+  return target_date_ts
 
-def get_cat_btns_by_type(db_filename, cat_type, divider):
-  ''' Return keyboard with needed categories ready to be used in msg '''
-  btns_arr = []
-  for cat in db.get_cats_arr(db_filename):
-    if cat.type == cat_type:
-      btn_data = enc_callback_data(divider, cat_type, cat.name)
-      btns_arr.append([cat.name, btn_data])
-  btns = get_btns_in_rows(2, btns_arr)
-  btns.add(get_back_to_start_btn(divider))
-  return btns
+def get_graph(user_id, days):
+  ''' Get graph of weight dynamic for last N days '''
+  target_day_ts = get_target_day_ts(days)
+  filter = 'date_ts > ' + str(target_day_ts)
+  records = db.get_recs_by_filter(user_id, filter)
+  
+  plt.figure()
+  title_tmplt = 'Weight dynamic: {date_from} - {date_to}'
+  title = title_tmplt.format(date_from=datetime.datetime.utcfromtimestamp(target_day_ts).strftime('%Y-%m-%d'), 
+                             date_to=datetime.datetime.today().strftime('%Y-%m-%d'))
+  plt.title(title)
+  plt.xlabel('Date')
+  plt.ylabel('Weight (kg)')
 
-def get_currency_btns(db_filename, divider, prefix):
-  ''' Return keyboard with currencies ready to be used in msg '''
-  btns_arr = []
-  for curr in db.get_currs_arr(db_filename):
-    btn_data = enc_callback_data(divider, prefix + 'curr', curr)
-    btns_arr.append([curr, btn_data])
-  btns = get_btns_in_rows(6, btns_arr)
-  btns.add(get_back_to_start_btn(divider))
-  return btns
+  dates_arr = []
+  weights_arr = []
 
+  for rec in records:
+    dates_arr.append(datetime.datetime.utcfromtimestamp(rec.date_ts).strftime('%Y-%m-%d %H:00'))
+    weights_arr.append(rec.weight)
 
-def get_start_rec_add_kbrd(divider, user_id=None):
-  ''' Returns default keyboard for /add_record func  '''
-  btns_arr = []
-  btns_arr.append(['Income', enc_callback_data(divider, 'start', 'income', user_id)])
-  btns_arr.append(['Expence', enc_callback_data(divider, 'start', 'expense', user_id)])
-  return get_btns_in_rows(2, btns_arr)
+  plt.plot(dates_arr, weights_arr)
+  plt.grid(ls=':')
+  
+  Path("graphs/" + str(user_id)).mkdir(parents=True, exist_ok=True)
 
-def get_btns_in_rows(columns_num, btn_data_arr):
-  ''' Return keyboard that is sorted in rows and columns '''
-  counter = 0
-  btn_arr = []
-  key = InlineKeyboardMarkup()
-  for btn in btn_data_arr:
-    if int(counter) >= int(columns_num):
-      counter = 0
-      key.row(*btn_arr)
-      btn_arr = []
-    counter += 1
-    btn_arr.append(InlineKeyboardButton(text=btn[0], callback_data=btn[1]))
-  if btn_arr:
-    key.row(*btn_arr)
-  return key
+  filename = './graphs/' + str(user_id) + '/' + str(days) + '_' + datetime.datetime.today().strftime('%Y-%m-%d_%H%M') + '.jpeg'
+  plt.savefig(filename)
 
-def get_curr_setup_kbrd(divider):
-  ''' Returns keyboard for currencies setup '''
-  btns_arr = []
-  btns_arr.append(['add', enc_callback_data(divider, 'curr_setup', 'add')])
-  btns_arr.append(['delete', enc_callback_data(divider, 'curr_setup', 'del')])
-  return get_btns_in_rows(2, btns_arr)
+  return filename
 
 def make_rec_readable(rec):
   ''' Make readable line with record info '''

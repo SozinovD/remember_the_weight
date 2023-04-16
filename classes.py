@@ -47,6 +47,7 @@ class Record:
 
   def get_obj_from_arr(self, arr):
     obj = Record()
+    print('get_obj_from_arr:', arr)
     obj.set_id(arr[0])
     obj.set_user_id(arr[1])
     obj.set_date_ts(arr[2])

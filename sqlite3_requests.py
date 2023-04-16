@@ -2,7 +2,9 @@ import sqlite3
 import os
 from tables import tables_arr
 
-def check_init(db_filename):
+from config import db_filename
+
+def check_init():
   ''' Connect to db, create if it doesn't exist, return conn obj '''
   try:
     conn = sqlite3.connect(db_filename)
@@ -18,7 +20,7 @@ def check_init(db_filename):
 
   return True
 
-def init_db(db_filename):
+def init_db():
   ''' Init db, create tables, input default values '''
   print('Init db, filename:\'' + db_filename + '\'')
 
@@ -38,7 +40,7 @@ def init_db(db_filename):
     if conn:
       conn.close()
 
-def select(db_filename, table, fields='*', filters=None):
+def select(table, fields='*', filters=None):
   ''' Make SELECT request to db '''
   try:
     conn = sqlite3.connect(db_filename)
@@ -56,7 +58,7 @@ def select(db_filename, table, fields='*', filters=None):
       conn.close()
   return result
 
-def add_many_records_to_db(db_filename, table, fields_arr):
+def add_many_records_to_db(table, fields_arr):
   ''' fields is an array of arrys: [field_name, value] is one key=value pair in record
       'fields_arr' is a array of 'fields' arrs '''
   try:
@@ -92,7 +94,7 @@ def add_many_records_to_db(db_filename, table, fields_arr):
       conn.close()
   return result
 
-def add_record_to_db(db_filename, table, fields):
+def add_record_to_db(table, fields):
   ''' fields is an array of arrys: [field_name, value] is one key=value pair in record '''
   try:
     request_template = 'INSERT INTO {tbl_name} ({flds}) VALUES ({qstn_marks})'
@@ -125,7 +127,7 @@ def add_record_to_db(db_filename, table, fields):
       conn.close()
   return result
 
-def del_records_from_db(db_filename, table, filters):
+def del_records_from_db(table, filters):
   ''' Delete records from any table in db by filters '''
   try:
     conn = sqlite3.connect(db_filename)
@@ -142,7 +144,7 @@ def del_records_from_db(db_filename, table, filters):
       conn.close()
   return result
 
-def update_records_in_db(db_filename, table, new_data, filters):
+def update_records_in_db(table, new_data, filters):
   ''' Update records in db by filters '''
   try:
     request_template = 'UPDATE {tbl} SET {data} WHERE {fltrs}'

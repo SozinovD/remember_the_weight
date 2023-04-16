@@ -6,3 +6,4 @@ tips.txt
 nohup.out
 *.sh
 tests/*
+graphs/*
