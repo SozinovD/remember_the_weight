@@ -39,9 +39,7 @@ class Form(StatesGroup):
 @dp.message_handler(state='*', commands='cancel')
 @dp.message_handler(Text(equals='cancel', ignore_case=True), state='*')
 async def cancel_handler(message: types.Message, state: FSMContext):
-    """
-    Allow user to cancel any action
-    """
+    ''' Allow user to cancel any action '''
     current_state = await state.get_state()
     if current_state is None:
         return
@@ -51,10 +49,12 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 
 @dp.message_handler(commands="start")
 async def show_help(message: types.Message):
+  ''' Show help msg at start '''
   await message.answer(funcs.get_help_msg())
 
 @dp.message_handler(commands="add_record")
 async def do_add_record(message: types.Message):
+  ''' handle 'add_record' command '''
   await Form.weight.set()
   line =  'Input your weight and an optional comment, valid examples:\n' \
           '*78.3*\n' \
@@ -63,7 +63,8 @@ async def do_add_record(message: types.Message):
   await message.answer(line, parse_mode='Markdown')
 
 @dp.message_handler(commands='add_skipped_record')
-async def show_month(message: types.Message):
+async def add_skipped_record(message: types.Message):
+  ''' handle 'add_record' command '''
   await Form.weight_past.set()
   line =  'Input date, your weight and an optional comment, valid examples:\n' \
           '*13.02.2023 78.3*\n' \
@@ -73,7 +74,7 @@ async def show_month(message: types.Message):
 
 @dp.message_handler(commands="del_rec_1_hour")
 async def del_rec_1_hour(message: types.Message):
-  await message.answer(db.del_last_rec_1_hour(message.from_user.id))
+  await message.answer(db.del_last_rec_1_day(message.from_user.id))
 
 @dp.message_handler(commands="show_week")
 async def show_week(message: types.Message):
@@ -93,7 +94,7 @@ async def show_n_days(message: types.Message):
   await message.answer('Input number of days you need like so:\n40')
 
 @dp.message_handler(state=Form.graph_n_days)
-async def get_weight_from_user(message: types.Message, state: FSMContext):
+async def send_graph(message: types.Message, state: FSMContext):
   days_num = message.text
   try:
     days_num = int(days_num)
@@ -104,7 +105,6 @@ async def get_weight_from_user(message: types.Message, state: FSMContext):
     line = 'ERROR: number of days is not an integer:\n' + days_num
     await message.answer(line)
   await state.finish()
-
 
 @dp.message_handler(state=Form.weight)
 async def get_weight_from_user(message: types.Message, state: FSMContext):

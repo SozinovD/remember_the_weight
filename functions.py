@@ -3,14 +3,16 @@ import datetime
 from pathlib import Path
 from matplotlib import pyplot as plt
 
+import os, os.path
+
 help_msg = '''
-This bot helps you to track your weught dynamic
+This bot helps you to track your weight
 There are commands below:
 
 /start - show this help page
 /add_record - add new record
 /add_skipped_record - add record for a past day
-/del_record_1_hour - delete last record that is not older than 1 hour
+/del_record_1_day - delete last record that is not older than 1 hour
 /show_week - show weight dynamic for last 7 days
 /show_month - show weight dynamic for last month
 /show_n_days - show as many days as you want
@@ -36,6 +38,8 @@ def get_target_day_ts(days):
 
 def get_graph(user_id, days):
   ''' Get graph of weight dynamic for last N days '''
+  del_old_graphs(user_id)
+
   target_day_ts = get_target_day_ts(days)
   filter = 'date_ts > ' + str(target_day_ts)
   records = db.get_recs_by_filter(user_id, filter)
@@ -67,6 +71,25 @@ def get_graph(user_id, days):
   plt.savefig(filename)
 
   return filename
+
+def del_old_graphs(user_id):
+  ''' Delete old graphs if there are more then 10 of them '''
+  path = 'graphs/' + str(user_id)
+  files_num = len(os.listdir(path))
+  # print('del_old_graphs', files_num)
+  if files_num < 10:
+    return
+  while files_num >= 10:
+    files_list = os.listdir(path)
+    full_path = [path + '/{0}'.format(x) for x in files_list]
+    oldest_file = min(full_path, key=os.path.getctime)
+    # print('rm', oldest_file)
+    os.remove(oldest_file)
+    files_num -= 1
+
+  print('del_old_graphs', files_num)
+  return 'done'
+
 
 def make_rec_readable(rec):
   ''' Make readable line with record info '''

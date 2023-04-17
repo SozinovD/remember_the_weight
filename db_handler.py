@@ -52,7 +52,7 @@ def get_recs_by_filter(user_id, filters=None):
   if filters != None:
     filt += ' AND ' + filters
   recs = db_requests.select('records', '*', filt)
-  print('get_recs_by_filter: ', recs)
+  # print('get_recs_by_filter: ', recs)
   new_rec = classes.Record()
   for rec in recs:
     recs_arr.append(new_rec.get_obj_from_arr(rec))
@@ -64,12 +64,12 @@ def get_last_n_recs(user_id, rec_num):
   recs_arr = get_recs_by_filter(user_id, 'id >= ' + str(min_num))
   return recs_arr
 
-def del_last_rec_1_hour(user_id, forced=False):
-  ''' Delete last record if it was made less then hour ago '''
+def del_last_rec_1_day(user_id, forced=False):
+  ''' Delete last record if it was made less then 1 day ago '''
   last_rec = get_last_n_recs(user_id, 1)[0]
-  # if more than 1 hour passed
-  if round(time.time(), 0) - last_rec.date_ts > 3600 and forced == False:
-    return 'Can\'t delete record older than 1 hour'
+  # if more than 1 day passed
+  if round(time.time(), 0) - last_rec.date_ts > 86400 and forced == False:
+    return 'Can\'t delete record older than 1 day'
   filters = 'id="' + str(last_rec.id) + '"'
   result = db_requests.del_records_from_db('records', filters)
   if result == filters:
