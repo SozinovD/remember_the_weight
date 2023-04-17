@@ -5,6 +5,8 @@ from matplotlib import pyplot as plt
 
 import os, os.path
 
+from io import BytesIO
+
 help_msg = '''
 This bot helps you to track your weight
 There are commands below:
@@ -38,7 +40,6 @@ def get_target_day_ts(days):
 
 def get_graph(user_id, days):
   ''' Get graph of weight dynamic for last N days '''
-  del_old_graphs(user_id)
 
   target_day_ts = get_target_day_ts(days)
   filter = 'date_ts > ' + str(target_day_ts)
@@ -58,34 +59,19 @@ def get_graph(user_id, days):
   records.sort(key=lambda x: x.date_ts, reverse = False)
 
   for rec in records:
-    # dates_arr.append(datetime.datetime.utcfromtimestamp(rec.date_ts).strftime('%Y-%m-%d %H:00'))
     dates_arr.append(datetime.datetime.utcfromtimestamp(rec.date_ts).strftime('%Y-%m-%d'))
     weights_arr.append(rec.weight)
 
   plt.plot(dates_arr, weights_arr)
   plt.grid(ls=':')
-  
-  Path("graphs/" + str(user_id)).mkdir(parents=True, exist_ok=True)
 
-  filename = './graphs/' + str(user_id) + '/' + str(days) + '_' + datetime.datetime.today().strftime('%Y-%m-%d_%H.%M') + '.jpeg'
-  plt.savefig(filename)
+  buff = BytesIO()
 
-  return filename
+  plt.savefig(buff, format="png")
 
-def del_old_graphs(user_id):
-  ''' Delete old graphs if there are more then 10 of them '''
-  path = 'graphs/' + str(user_id)
-  files_num = len(os.listdir(path))
-  # print('del_old_graphs', files_num)
-  if files_num < 10:
-    return
-  while files_num >= 10:
-    files_list = os.listdir(path)
-    full_path = [path + '/{0}'.format(x) for x in files_list]
-    oldest_file = min(full_path, key=os.path.getctime)
-    # print('rm', oldest_file)
-    os.remove(oldest_file)
-    files_num -= 1
+  buff.seek(0)
+
+  return buff
 
   print('del_old_graphs', files_num)
   return 'done'

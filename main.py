@@ -192,8 +192,6 @@ def add_record(user_id, weight, comment, date=None):
 
 if __name__ == '__main__':
 
-  Path("graphs").mkdir(parents=True, exist_ok=True)
-
   db_started = db.start()
   print('Start db:', db_started)
 
