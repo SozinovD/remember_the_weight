@@ -16,6 +16,10 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types.input_file import InputFile
 from aiogram.dispatcher.filters import Text
 
+from aiogram.types import ReplyKeyboardRemove, \
+    ReplyKeyboardMarkup, KeyboardButton, \
+    InlineKeyboardMarkup, InlineKeyboardButton
+
 from pathlib import Path
 
 from matplotlib import pyplot as plt
@@ -72,9 +76,20 @@ async def add_skipped_record(message: types.Message):
           '*13.02.2023 40.1 oops, i need to eat!*'
   await message.answer(line, parse_mode='Markdown')
 
-@dp.message_handler(commands="del_rec_1_hour")
+@dp.message_handler(commands="del_record_1_day")
 async def del_rec_1_hour(message: types.Message):
-  await message.answer(db.del_last_rec_1_day(message.from_user.id))
+  key = InlineKeyboardMarkup()
+  last_rec = db.get_last_n_recs(message.from_user.id, 1)[0]
+  key.row(InlineKeyboardButton(text='I want to delete this record', callback_data='del_rec_' + str(message.from_user.id)))
+  line = 'Last record:\n\n'
+  line += funcs.make_rec_readable(last_rec)
+  await message.answer(text=line, reply_markup=key)
+
+@dp.callback_query_handler(lambda c: c.data)
+async def callback_inline(call: types.CallbackQuery):
+  call_data_arr = call.data.split('_')
+  if call_data_arr[0] == 'del' and call_data_arr[1] == 'rec':
+    await call.answer(db.del_last_rec_1_day(call_data_arr[2]))
 
 @dp.message_handler(commands="show_week")
 async def show_week(message: types.Message):
