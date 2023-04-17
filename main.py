@@ -16,9 +16,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types.input_file import InputFile
 from aiogram.dispatcher.filters import Text
 
-from aiogram.types import ReplyKeyboardRemove, \
-    ReplyKeyboardMarkup, KeyboardButton, \
-    InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from pathlib import Path
 
