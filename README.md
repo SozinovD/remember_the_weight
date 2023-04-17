@@ -2,7 +2,9 @@
 
 ## Description
 
-This bot 
+This bot provides you with useful interface for writing down your weight measures and creating graphics of how it changes over time
+
+It can be useful for any people that want to get easy way to track changes in their body, for example bodybuilders
 
 ## Requirements
 
