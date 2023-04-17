@@ -57,7 +57,7 @@ chmod +x main.py
 
 ## Features that will not be implemented
 
-* change timezone, so graph will be shown according to your time
-* change weight measure (kg\lb)
+* ability to change timezone, so graph will be shown according to your time
+* ability to change weight measure (kg\lb). Now it's hardcoded to kg, every record has it
 
 I dont want to put more time into this project, but ideas should be written down :D
