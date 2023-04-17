@@ -79,7 +79,11 @@ async def add_skipped_record(message: types.Message):
 @dp.message_handler(commands="del_record_1_day")
 async def del_rec_1_hour(message: types.Message):
   key = InlineKeyboardMarkup()
-  last_rec = db.get_last_n_recs(message.from_user.id, 1)[0]
+  try:
+    last_rec = db.get_last_n_recs(message.from_user.id, 1)[0]
+  except Exception:
+    await message.answer('Record not found')
+    return
   key.row(InlineKeyboardButton(text='I want to delete this record', callback_data='del_rec_' + str(message.from_user.id)))
   line = 'Last record:\n\n'
   line += funcs.make_rec_readable(last_rec)
