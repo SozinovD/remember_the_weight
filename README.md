@@ -8,6 +8,8 @@ It can be useful for any people that want to get easy way to track changes in th
 
 It records user_id of who made a record, so a user can get only his(or her) data in report
 
+Sqlite3 is used as database, but you can use any other, just write other library that makes calls to database and import it in db_handler.py as db_requests
+
 ## Requirements
 
 * python3
