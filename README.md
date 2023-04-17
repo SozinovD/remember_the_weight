@@ -6,6 +6,8 @@ This bot provides you with useful interface for writing down your weight measure
 
 It can be useful for any people that want to get easy way to track changes in their body, for example bodybuilders
 
+It records user_id of who made a record, so a user can get only his(or her) data in report
+
 ## Requirements
 
 * python3
