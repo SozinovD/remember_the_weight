@@ -63,7 +63,7 @@ def get_graph(user_id, days):
   
   Path("graphs/" + str(user_id)).mkdir(parents=True, exist_ok=True)
 
-  filename = './graphs/' + str(user_id) + '/' + str(days) + '_' + datetime.datetime.today().strftime('%Y-%m-%d_%H%M') + '.jpeg'
+  filename = './graphs/' + str(user_id) + '/' + str(days) + '_' + datetime.datetime.today().strftime('%Y-%m-%d_%H.%M') + '.jpeg'
   plt.savefig(filename)
 
   return filename
