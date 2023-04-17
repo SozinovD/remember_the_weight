@@ -54,3 +54,10 @@ After you are done with it press CTRL+S to save file and CTRL+X to exit nano
 chmod +x main.py
 ./main.py
 ```
+
+## Features that will not be implemented
+
+* change timezone, so graph will be shown according to your time
+* change weight measure (kg\lb)
+
+I dont want to put more time into this project, but ideas should be written down :D
