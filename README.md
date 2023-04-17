@@ -27,7 +27,7 @@ Sqlite3 is used as database, but you can use any other, just write other library
 start - show this help page
 add_record - add new record
 add_skipped_record - add record for a past day
-del_record_1_hour - delete last record that is not older than 1 hour
+del_record_1_day - delete last record that is not older than 1 day
 show_week - show weight dynamic for last 7 days
 show_month - show weight dynamic for last month
 show_n_days - show as many days as you want
