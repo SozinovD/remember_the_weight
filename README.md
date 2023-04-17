@@ -34,15 +34,21 @@ cancel - cancel any action
 
 1. Clone this repo, go to repo dir
 
-`git clone https://github.com/SozinovD/remember_the_weight; cd remember_the_weight`
+```
+git clone https://github.com/SozinovD/remember_the_weight; cd remember_the_weight
+```
 
 2. Install requirements
 
-`python3 -m pip install -r requirements.txt`
+```
+python3 -m pip install -r requirements.txt
+```
 
 3. Rename 'config.py.empty' to 'config.py' and fill in bot token
 
-`mv config.py.empty config.py; nano config.py`
+```
+mv config.py.empty config.py; nano config.py
+```
 
 After you are done with it press CTRL+S to save file and CTRL+X to exit nano
 
