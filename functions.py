@@ -63,6 +63,7 @@ def get_graph(user_id, days):
     weights_arr.append(rec.weight)
 
   plt.plot(dates_arr, weights_arr)
+  plt.scatter(dates_arr, weights_arr)
   plt.grid(ls=':')
 
   buff = BytesIO()
@@ -72,9 +73,6 @@ def get_graph(user_id, days):
   buff.seek(0)
 
   return buff
-
-  print('del_old_graphs', files_num)
-  return 'done'
 
 
 def make_rec_readable(rec):
