@@ -51,6 +51,7 @@ def get_graph(user_id, days):
                              date_to=datetime.datetime.today().strftime('%Y-%m-%d'))
   plt.title(title)
   plt.xlabel('Date')
+  plt.xticks(rotation=20)
   plt.ylabel('Weight (kg)')
 
   dates_arr = []
